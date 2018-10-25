@@ -23,6 +23,7 @@ public final class consumerGroup {
     }
   }
 
+  //execute starts the desired threads
   public void execute() {
     for (consumerThread ncThread : consumers) {
       Thread t = new Thread(ncThread);
@@ -32,21 +33,21 @@ public final class consumerGroup {
   
   public static void main(String[] args) {
 	  
-	  //PropertyConfigurator.configure();
-
+	//General configuration for each consumer group
     String brokers = "localhost:9092, localhost:9093";
     String groupId_Rain = "group-1";
     String groupId_Particles = "group-2";
     List <String> topics_Rain = Arrays.asList("SO2","NO","NO2");
     List <String> topics_Particles = Arrays.asList("PM2.5","PM10");
-    int numberOfConsumer = 2;
+    int numberOfConsumer = 2; //Two consumers on each consumer group
 
     // Start group of Notification Consumers
-    consumerGroup consumerGroup =
+    consumerGroup consumerGroup1 =
         new consumerGroup(brokers, groupId_Rain, topics_Rain, numberOfConsumer);
     consumerGroup consumerGroup2 =
         new consumerGroup(brokers, groupId_Particles, topics_Particles, numberOfConsumer);
-    consumerGroup.execute();
+    //Start executing the two consumer groups
+    consumerGroup1.execute();
     consumerGroup2.execute();
 
     try {

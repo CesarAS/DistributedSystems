@@ -11,14 +11,8 @@ public class consumerThread implements Runnable {
   private final List<String> topic;
 
   public consumerThread(String brokers, String groupId, List <String> topic) {
-    Properties prop = createConsumerConfig(brokers, groupId);
-    this.consumer = new KafkaConsumer<>(prop);
-    this.topic = topic;
-    this.consumer.subscribe(this.topic);
-  }
-
-  private static Properties createConsumerConfig(String brokers, String groupId) {
-    Properties props = new Properties();
+    //The consumer properties are created for every created thread
+	Properties props = new Properties();
     props.put("bootstrap.servers", brokers);
     props.put("group.id", groupId);
     props.put("enable.auto.commit", "false");
@@ -28,19 +22,23 @@ public class consumerThread implements Runnable {
     props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     props.put("heartbeat.interval.ms", "5000");
-    return props;
+    this.consumer = new KafkaConsumer<>(props);
+    this.topic = topic;
+    //Subscribe to the corresponding topics
+    this.consumer.subscribe(this.topic);
   }
 
   @Override
   public void run() {
 	  try {
 		  while (true) {
+			  //The consumer will poll the server and wait for new records for 100 ms
 			  ConsumerRecords<String, String> records = consumer.poll(100);
 			  for (ConsumerRecord<String, String> record : records) {
-				  System.out.println("Message: " + record.value() + ", Topic: "
-						  + record.topic() + ", Offset: " + record.offset() + ", by ThreadID: "
-						  + Thread.currentThread().getId());
-				  consumer.commitSync();
+				  System.out.println("Data: " + record.value() + ", Topic: "
+						  + record.topic() + ", Offset: " + record.offset() + ", Thread: "
+						  + Thread.currentThread().getId());	
+				  consumer.commitSync(); // Synchronous commit to get at-least-once semantics
 			  }
 		  }
 	  } finally {

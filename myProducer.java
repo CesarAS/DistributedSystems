@@ -32,7 +32,7 @@ public class myProducer {
 			props.put("max.in.flight.requests.per.connection" , "3");			
 			props.put("request.timeout.ms", "10000");
 			props.put("batch.size", "2048");
-			
+			//Creating the producer
 			producer = new KafkaProducer<>(props);
 		}
 		void produce() throws InterruptedException {
